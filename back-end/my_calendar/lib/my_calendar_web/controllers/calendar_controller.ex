@@ -16,14 +16,14 @@ defmodule MyCalendarWeb.CalendarController do
   def create(conn, task_to_create = %{"date" => _, "label" => _}) do
     task_date = Map.get(task_to_create, "date")
 
-    created_task =
-      task_to_create
-      |> Map.delete("date")
-      |> Calendar.add_task(task_date)
-
-    conn
-    |> put_status(200)
-    |> json(%{task: sanitize_map(created_task)})
+    with {:ok, created_task} <-
+           task_to_create
+           |> Map.delete("date")
+           |> Calendar.add_task(task_date) do
+      conn
+      |> put_status(200)
+      |> json(%{task: sanitize_map(created_task)})
+    end
   end
 
   def create(conn, _params) do
