@@ -22,3 +22,11 @@ erl_crash.dump
 # Ignore package tarball (built via "mix hex.build").
 my_calendar-*.tar
 
+# Compiled files
+*.beam
+
+# Secret configs
+/config/*.secret.exs
+
+# ElixirLS extension
+.elixir_ls/
