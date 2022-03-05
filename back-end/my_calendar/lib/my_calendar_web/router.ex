@@ -7,6 +7,10 @@ defmodule MyCalendarWeb.Router do
 
   scope "/api", MyCalendarWeb do
     pipe_through :api
+
+    get "/", CalendarController, :index
+    post "/", CalendarController, :create
+    delete "/", CalendarController, :delete
   end
 
   # Enables LiveDashboard only for development
