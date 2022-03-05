@@ -6,6 +6,7 @@ defmodule MyCalendar.TaskDay do
 
   @fields [:date]
 
+  @derive {Jason.Encoder, only: [:date]}
   schema "task_days" do
     field :date, :date
 
