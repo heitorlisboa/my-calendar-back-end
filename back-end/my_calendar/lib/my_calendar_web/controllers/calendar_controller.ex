@@ -1,22 +1,24 @@
 defmodule MyCalendarWeb.CalendarController do
   use MyCalendarWeb, :controller
+
   alias MyCalendar.Calendar
+  alias MyCalendar.Task
   import Utilities, only: [sanitize_map: 1]
 
-  @spec index(Plug.Conn.t(), any) :: Plug.Conn.t()
+  @spec index(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def index(conn, _params) do
     tasks =
-      Calendar.show_tasks()
+      Calendar.list_task_days()
       |> Enum.map(&sanitize_map/1)
 
     json(conn, tasks)
   end
 
   @spec create(Plug.Conn.t(), map()) :: Plug.Conn.t()
-  def create(conn, task_to_create = %{"date" => _, "label" => _}) do
+  def create(conn, %{"date" => _, "label" => _} = task_to_create) do
     task_date = Map.get(task_to_create, "date")
 
-    with {:ok, created_task} <-
+    with {:ok, %Task{} = created_task} <-
            task_to_create
            |> Map.delete("date")
            |> Calendar.add_task(task_date) do
@@ -26,24 +28,27 @@ defmodule MyCalendarWeb.CalendarController do
     end
   end
 
-  def create(conn, _params) do
-    conn
-    |> put_status(400)
-    |> json(%{error: "Not a valid task"})
+  @spec update(Plug.Conn.t(), map()) :: Plug.Conn.t()
+  def update(conn, %{"id" => id, "changes" => changes}) do
+    task_to_update = Calendar.get_task!(id)
+
+    with {:ok, %Task{} = updated_task} <- Calendar.update_task(task_to_update, changes) do
+      conn
+      |> put_status(200)
+      |> json(%{task: sanitize_map(updated_task)})
+    end
   end
 
   @spec delete(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def delete(conn, %{"id" => id}) do
-    with {:ok, deleted_task} <- Calendar.remove_task(id) do
+    task_to_delete = Calendar.get_task!(id)
+
+    # TODO: Check if `deleted_task` is the same as `task_to_delete` or it is an
+    # empty struct or something else
+    with {:ok, %Task{} = deleted_task} <- Calendar.remove_task(task_to_delete) do
       conn
       |> put_status(200)
       |> json(%{task: sanitize_map(deleted_task)})
     end
-  end
-
-  def delete(conn, _params) do
-    conn
-    |> put_status(400)
-    |> json(%{error: "Id is missing in parameters"})
   end
 end
