@@ -33,6 +33,9 @@ defmodule MyCalendar.Calendar do
   end
 
   # Task operations
+  @spec get_task!(integer()) :: struct()
+  def get_task!(id), do: Repo.get!(Task, id)
+
   @spec add_task(map(), String.t()) :: {:ok, struct()} | {:error, Ecto.Changeset.t()}
   def add_task(attrs, date) do
     task_to_add = process_task_time!(attrs)
@@ -49,6 +52,21 @@ defmodule MyCalendar.Calendar do
         {:ok, Repo.preload(added_task, [:task_day])}
       end
     end
+  end
+
+  @spec update_task(struct(), map()) :: {:ok, struct()} | {:error, Ecto.Changeset.t()}
+  def update_task(%Task{} = task, attrs) do
+    attrs =
+      attrs
+      |> process_task_time!()
+      # Deleting the `task_day_id` entry if it exists since I don't want it to
+      # be changed directly
+      |> Map.delete("task_day_id")
+
+    # TODO: Create advance and delay task system
+    task
+    |> Task.changeset(attrs)
+    |> Repo.update()
   end
 
   @spec remove_task(struct()) :: {:ok, struct()} | {:error, Ecto.Changeset.t()}
