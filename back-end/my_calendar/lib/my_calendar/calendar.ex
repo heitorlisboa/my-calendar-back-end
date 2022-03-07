@@ -64,15 +64,21 @@ defmodule MyCalendar.Calendar do
       |> Map.delete("task_day_id")
 
     # TODO: Create advance and delay task system
-    task
-    |> Task.changeset(attrs)
-    |> Repo.update()
+
+    with {:ok, updated_task} <-
+           task
+           |> Task.changeset(attrs)
+           |> Repo.update() do
+      {:ok, Repo.preload(updated_task, [:task_day])}
+    end
   end
 
   @spec remove_task(struct()) :: {:ok, struct()} | {:error, Ecto.Changeset.t()}
   def remove_task(%Task{} = task) do
     # TODO: Delete `task_day` if it remains empty after deleting `task`
-    Repo.delete(task)
+    with {:ok, removed_task} <- Repo.delete(task) do
+      {:ok, Repo.preload(removed_task, [:task_day])}
+    end
   end
 
   @spec process_task_time!(map()) :: map()
