@@ -2,7 +2,7 @@ defmodule MyCalendar.Calendar.Task do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias MyCalendar.Calendar.Task
+  alias MyCalendar.Calendar.TaskDay
 
   @fields [:label, :description, :time, :task_day_id]
 
@@ -12,7 +12,7 @@ defmodule MyCalendar.Calendar.Task do
     field :description, :string
     field :time, :time
 
-    belongs_to :task_day, Task
+    belongs_to :task_day, TaskDay
 
     timestamps()
   end
