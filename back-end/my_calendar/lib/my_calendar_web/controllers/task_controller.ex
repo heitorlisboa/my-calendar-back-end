@@ -1,18 +1,9 @@
-defmodule MyCalendarWeb.CalendarController do
+defmodule MyCalendarWeb.TaskController do
   use MyCalendarWeb, :controller
 
   alias MyCalendar.Calendar
-  alias MyCalendar.Task
+  alias MyCalendar.Calendar.Task
   import Utilities, only: [sanitize_map: 1]
-
-  @spec index(Plug.Conn.t(), map()) :: Plug.Conn.t()
-  def index(conn, _params) do
-    tasks =
-      Calendar.list_task_days()
-      |> Enum.map(&sanitize_map/1)
-
-    json(conn, tasks)
-  end
 
   @spec create(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def create(conn, %{"date" => _, "label" => _} = task_to_create) do

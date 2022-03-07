@@ -1,8 +1,8 @@
-defmodule MyCalendar.TaskDay do
+defmodule MyCalendar.Calendar.TaskDay do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias MyCalendar.Task
+  alias MyCalendar.Calendar.Task
 
   @fields [:date]
 

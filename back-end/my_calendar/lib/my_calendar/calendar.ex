@@ -1,7 +1,7 @@
 defmodule MyCalendar.Calendar do
   alias MyCalendar.Repo
-  alias MyCalendar.TaskDay
-  alias MyCalendar.Task
+  alias MyCalendar.Calendar.TaskDay
+  alias MyCalendar.Calendar.Task
 
   # TaskDay operations
   @spec list_task_days :: nil | [%{optional(atom()) => any()}] | %{optional(atom()) => any()}
