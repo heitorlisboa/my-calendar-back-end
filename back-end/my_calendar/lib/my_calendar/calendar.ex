@@ -10,8 +10,8 @@ defmodule MyCalendar.Calendar do
     |> Repo.preload([:tasks])
   end
 
-  @spec add_task_day(map()) :: {:ok, struct()} | {:error, Ecto.Changeset.t()}
-  def add_task_day(%{"date" => date}) do
+  @spec create_task_day(map()) :: {:ok, struct()} | {:error, Ecto.Changeset.t()}
+  def create_task_day(%{"date" => date}) do
     date = Date.from_iso8601!(date)
 
     %TaskDay{}
@@ -23,7 +23,7 @@ defmodule MyCalendar.Calendar do
   defp get_or_create_task_day(date) do
     case Repo.get_by(TaskDay, date: date) do
       nil ->
-        with {:ok, _new_task_day} = result <- add_task_day(%{"date" => date}) do
+        with {:ok, _new_task_day} = result <- create_task_day(%{"date" => date}) do
           result
         end
 
