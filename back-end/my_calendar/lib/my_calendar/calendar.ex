@@ -10,6 +10,9 @@ defmodule MyCalendar.Calendar do
     |> Repo.preload([:tasks])
   end
 
+  @spec get_task_day!(integer()) :: struct()
+  def get_task_day!(id), do: Repo.get!(TaskDay, id)
+
   @spec create_task_day(map()) :: {:ok, struct()} | {:error, Ecto.Changeset.t()}
   def create_task_day(%{"date" => date}) do
     date = Date.from_iso8601!(date)
@@ -31,6 +34,9 @@ defmodule MyCalendar.Calendar do
         {:ok, existing_task_day}
     end
   end
+
+  @spec remove_task_day(struct()) :: {:ok, struct()} | {:error, Ecto.Changeset.t()}
+  def remove_task_day(%TaskDay{} = task_day), do: Repo.delete(task_day)
 
   # Task operations
   @spec get_task!(integer()) :: struct()
@@ -75,8 +81,13 @@ defmodule MyCalendar.Calendar do
 
   @spec remove_task(struct()) :: {:ok, struct()} | {:error, Ecto.Changeset.t()}
   def remove_task(%Task{} = task) do
-    # TODO: Delete `task_day` if it remains empty after deleting `task`
     with {:ok, removed_task} <- Repo.delete(task) do
+      task_day =
+        get_task_day!(removed_task.task_day_id)
+        |> Repo.preload([:tasks])
+
+      if length(task_day.tasks) == 0, do: remove_task_day(task_day)
+
       {:ok, Repo.preload(removed_task, [:task_day])}
     end
   end
