@@ -42,6 +42,9 @@ defmodule MyCalendar.Calendar do
   @spec get_task!(integer()) :: struct()
   def get_task!(id), do: Repo.get!(Task, id)
 
+  @spec get_task(integer()) :: struct() | nil
+  def get_task(id), do: Repo.get(Task, id)
+
   @spec add_task(map(), String.t()) :: {:ok, struct()} | {:error, Ecto.Changeset.t()}
   def add_task(attrs, date) do
     task_to_add = process_task_time!(attrs)
