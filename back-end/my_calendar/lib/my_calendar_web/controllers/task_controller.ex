@@ -3,7 +3,6 @@ defmodule MyCalendarWeb.TaskController do
 
   alias MyCalendar.Calendar
   alias MyCalendar.Calendar.Task
-  import Utilities, only: [sanitize_map: 1]
 
   @spec create(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def create(conn, %{"date" => _, "label" => _} = task_to_create) do
@@ -15,7 +14,7 @@ defmodule MyCalendarWeb.TaskController do
            |> Calendar.add_task(task_date) do
       conn
       |> put_status(200)
-      |> json(%{task: sanitize_map(created_task)})
+      |> render("show.json", task: created_task)
     end
   end
 
@@ -26,7 +25,7 @@ defmodule MyCalendarWeb.TaskController do
     with {:ok, %Task{} = updated_task} <- Calendar.update_task(task_to_update, changes) do
       conn
       |> put_status(200)
-      |> json(%{task: sanitize_map(updated_task)})
+      |> render("show.json", task: updated_task)
     end
   end
 
@@ -34,12 +33,10 @@ defmodule MyCalendarWeb.TaskController do
   def delete(conn, %{"id" => id}) do
     task_to_delete = Calendar.get_task!(id)
 
-    # TODO: Check if `deleted_task` is the same as `task_to_delete` or it is an
-    # empty struct or something else
     with {:ok, %Task{} = deleted_task} <- Calendar.remove_task(task_to_delete) do
       conn
       |> put_status(200)
-      |> json(%{task: sanitize_map(deleted_task)})
+      |> render("show.json", task: deleted_task)
     end
   end
 end
