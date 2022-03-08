@@ -6,6 +6,8 @@ defmodule MyCalendar.Calendar.TaskDay do
 
   @fields [:date]
 
+  @primary_key {:id, :binary_id, autogenerate: true}
+  @foreign_key_type :binary_id
   schema "task_days" do
     field :date, :date
 

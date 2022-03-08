@@ -6,6 +6,8 @@ defmodule MyCalendar.Calendar.Task do
 
   @fields [:label, :description, :time, :task_day_id]
 
+  @primary_key {:id, :binary_id, autogenerate: true}
+  @foreign_key_type :binary_id
   schema "tasks" do
     field :label, :string
     field :description, :string
