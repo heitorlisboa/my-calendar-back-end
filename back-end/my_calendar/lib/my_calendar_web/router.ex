@@ -8,11 +8,12 @@ defmodule MyCalendarWeb.Router do
   scope "/api", MyCalendarWeb do
     pipe_through :api
 
-    get "/", TaskDayController, :index
-    post "/", TaskController, :create
-    put "/", TaskController, :update
-    patch "/", TaskController, :update
-    delete "/", TaskController, :delete
+    get "/task_day", TaskDayController, :index
+
+    post "/task", TaskController, :create
+    put "/task/:id", TaskController, :update
+    patch "/task/:id", TaskController, :update
+    delete "/task/:id", TaskController, :delete
   end
 
   # Enables LiveDashboard only for development
