@@ -9,6 +9,9 @@ defmodule MyCalendar.Accounts do
     |> Repo.insert()
   end
 
+  @spec get_user!(integer()) :: struct()
+  def get_user!(id), do: Repo.get!(User, id)
+
   @spec get_user_by_email(String.t()) :: {:ok, struct()} | {:error, :not_found}
   def get_user_by_email(email) do
     case Repo.get_by(User, email: email) do
