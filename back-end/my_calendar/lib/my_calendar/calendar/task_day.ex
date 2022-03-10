@@ -2,6 +2,7 @@ defmodule MyCalendar.Calendar.TaskDay do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias MyCalendar.Accounts.User
   alias MyCalendar.Calendar.Task
 
   @fields [:date]
@@ -11,6 +12,7 @@ defmodule MyCalendar.Calendar.TaskDay do
   schema "task_days" do
     field :date, :date
 
+    belongs_to :user, User
     has_many :tasks, Task
 
     timestamps()
