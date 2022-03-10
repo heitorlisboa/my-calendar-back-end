@@ -10,6 +10,6 @@ defmodule MyCalendarWeb.FallbackController do
   def call(conn, {:error, status}) when is_atom(status) do
     conn
     |> put_status(status)
-    |> json(%{error: "Task with provided ID not found"})
+    |> json(%{error: status})
   end
 end

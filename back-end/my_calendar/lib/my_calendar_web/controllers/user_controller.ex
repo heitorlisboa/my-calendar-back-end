@@ -4,7 +4,7 @@ defmodule MyCalendarWeb.UserController do
   alias MyCalendar.Accounts
   alias MyCalendar.Accounts.User
 
-  def create(conn, user_to_create) do
+  def register(conn, user_to_create) do
     with {:ok, %User{}} <- Accounts.create_user(user_to_create) do
       conn
       |> put_status(:created)

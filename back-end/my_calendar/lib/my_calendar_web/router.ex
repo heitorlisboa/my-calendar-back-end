@@ -8,7 +8,7 @@ defmodule MyCalendarWeb.Router do
   scope "/api", MyCalendarWeb do
     pipe_through :api
 
-    post "/users", UserController, :create
+    post "/users", UserController, :register
 
     get "/task_day", TaskDayController, :index
 

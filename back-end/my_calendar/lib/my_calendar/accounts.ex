@@ -17,6 +17,7 @@ defmodule MyCalendar.Accounts do
     end
   end
 
+  @spec authenticate_user(String.t(), String.t()) :: {:ok, struct()} | {:error, :unauthorized}
   def authenticate_user(email, password) do
     with {:ok, user} <- get_user_by_email(email) do
       case validate_password(password, user.password) do
