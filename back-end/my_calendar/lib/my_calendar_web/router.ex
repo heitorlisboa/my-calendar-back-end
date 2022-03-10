@@ -5,10 +5,15 @@ defmodule MyCalendarWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :auth do
+    plug MyCalendar.Guardian.AuthPipeline
+  end
+
   scope "/api", MyCalendarWeb do
     pipe_through :api
 
     post "/users", UserController, :register
+    post "/session/new", SessionController, :new
 
     get "/task_day", TaskDayController, :index
 
@@ -16,6 +21,13 @@ defmodule MyCalendarWeb.Router do
     put "/task/:id", TaskController, :update
     patch "/task/:id", TaskController, :update
     delete "/task/:id", TaskController, :delete
+  end
+
+  scope "/api", MyCalendarWeb do
+    pipe_through [:api, :auth]
+
+    post "/session/refresh", SessionController, :refresh
+    post "/session/delete", SessionController, :delete
   end
 
   # Enables LiveDashboard only for development
