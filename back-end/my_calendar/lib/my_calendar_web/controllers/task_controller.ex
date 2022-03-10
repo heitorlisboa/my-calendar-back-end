@@ -15,27 +15,27 @@ defmodule MyCalendarWeb.TaskController do
            |> Map.delete("date")
            |> Calendar.add_task(task_date) do
       conn
-      |> put_status(200)
+      |> put_status(:created)
       |> render("show.json", task: created_task)
     end
   end
 
   @spec update(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def update(conn, %{"id" => id, "changes" => changes}) do
-    with task_to_update when not is_nil(task_to_update) <- Calendar.get_task(id),
+    with {:ok, task_to_update} <- Calendar.get_task(id),
          {:ok, %Task{} = updated_task} <- Calendar.update_task(task_to_update, changes) do
       conn
-      |> put_status(200)
+      |> put_status(:ok)
       |> render("show.json", task: updated_task)
     end
   end
 
   @spec delete(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def delete(conn, %{"id" => id}) do
-    with task_to_delete when not is_nil(task_to_delete) <- Calendar.get_task(id),
+    with {:ok, task_to_delete} <- Calendar.get_task(id),
          {:ok, %Task{} = deleted_task} <- Calendar.remove_task(task_to_delete) do
       conn
-      |> put_status(200)
+      |> put_status(:ok)
       |> render("show.json", task: deleted_task)
     end
   end

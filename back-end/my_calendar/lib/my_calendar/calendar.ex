@@ -42,8 +42,13 @@ defmodule MyCalendar.Calendar do
   @spec get_task!(integer()) :: struct()
   def get_task!(id), do: Repo.get!(Task, id)
 
-  @spec get_task(integer()) :: struct() | nil
-  def get_task(id), do: Repo.get(Task, id)
+  @spec get_task(integer()) :: {:ok, struct()} | {:error, :not_found}
+  def get_task(id) do
+    case Repo.get(Task, id) do
+      nil -> {:error, :not_found}
+      task -> {:ok, task}
+    end
+  end
 
   @spec add_task(map(), String.t()) :: {:ok, struct()} | {:error, Ecto.Changeset.t()}
   def add_task(attrs, date) do
