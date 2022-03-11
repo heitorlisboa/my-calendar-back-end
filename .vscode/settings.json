@@ -1,7 +1,4 @@
 {
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "cssvar.files": ["front-end/src/styles/global/variables.css"],
-  "cssvar.extensions": ["css", "scss"],
   "[elixir]": {
     "editor.defaultFormatter": "JakeBecker.elixir-ls",
     "editor.formatOnType": true,
@@ -9,6 +6,5 @@
     "files.trimTrailingWhitespace": true,
     "files.insertFinalNewline": true,
     "files.trimFinalNewlines": true
-  },
-  "elixirLS.projectDir": "./back-end/my_calendar"
+  }
 }
