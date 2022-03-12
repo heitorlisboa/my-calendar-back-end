@@ -12,10 +12,13 @@ defmodule MyCalendar.Accounts do
   @spec get_user!(integer()) :: struct()
   def get_user!(id), do: Repo.get!(User, id)
 
-  @spec get_user_by_email(String.t()) :: {:ok, struct()} | {:error, :not_found}
+  @spec get_user_by_email(String.t()) :: {:ok, struct()} | {:error, :unauthorized}
   def get_user_by_email(email) do
     case Repo.get_by(User, email: email) do
-      nil -> {:error, :not_found}
+      # Even though the user was not found, I don't wanna return status 404 (not
+      # found) because a malicious user could keep trying different emails until
+      # they find an email that is registered
+      nil -> {:error, :unauthorized}
       user -> {:ok, user}
     end
   end
