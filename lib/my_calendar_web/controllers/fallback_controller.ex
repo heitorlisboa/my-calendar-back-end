@@ -5,8 +5,8 @@ defmodule MyCalendarWeb.FallbackController do
     error_messages =
       changeset.errors
       |> Enum.map(fn error ->
-        {_field, {message, _cause}} = error
-        message
+        {field, {message, _cause}} = error
+        to_string(field) <> " " <> message
       end)
 
     conn
