@@ -9,7 +9,7 @@ defmodule MyCalendar.Accounts do
     |> Repo.insert()
   end
 
-  @spec get_user!(integer()) :: struct()
+  @spec get_user!(binary()) :: struct()
   def get_user!(id), do: Repo.get!(User, id)
 
   @spec get_user_by_email(String.t()) :: {:ok, struct()} | {:error, :unauthorized}

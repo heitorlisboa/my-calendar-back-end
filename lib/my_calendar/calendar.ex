@@ -10,7 +10,7 @@ defmodule MyCalendar.Calendar do
     |> Repo.preload([:tasks])
   end
 
-  @spec get_task_day!(integer()) :: struct()
+  @spec get_task_day!(binary()) :: struct()
   def get_task_day!(id), do: Repo.get!(TaskDay, id)
 
   @spec create_task_day(map()) :: {:ok, struct()} | {:error, Ecto.Changeset.t()}
@@ -39,10 +39,10 @@ defmodule MyCalendar.Calendar do
   def remove_task_day(%TaskDay{} = task_day), do: Repo.delete(task_day)
 
   # Task operations
-  @spec get_task!(integer()) :: struct()
+  @spec get_task!(binary()) :: struct()
   def get_task!(id), do: Repo.get!(Task, id)
 
-  @spec get_task(integer()) :: {:ok, struct()} | {:error, :not_found}
+  @spec get_task(binary()) :: {:ok, struct()} | {:error, :not_found}
   def get_task(id) do
     case Repo.get(Task, id) do
       nil -> {:error, :not_found}
