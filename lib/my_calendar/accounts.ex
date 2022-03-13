@@ -23,6 +23,13 @@ defmodule MyCalendar.Accounts do
     end
   end
 
+  @spec get_user_id_by_conn(Plug.Conn.t()) :: binary()
+  def get_user_id_by_conn(conn) do
+    conn
+    |> Map.from_struct()
+    |> get_in([:private, :guardian_default_claims, "sub"])
+  end
+
   @spec authenticate_user(String.t(), String.t()) :: {:ok, struct()} | {:error, :unauthorized}
   def authenticate_user(email, password) do
     with {:ok, user} <- get_user_by_email(email) do

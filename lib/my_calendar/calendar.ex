@@ -1,34 +1,39 @@
 defmodule MyCalendar.Calendar do
+  import Ecto.Query, only: [from: 2]
+
   alias MyCalendar.Repo
   alias MyCalendar.Calendar.TaskDay
   alias MyCalendar.Calendar.Task
 
   # TaskDay operations
-  @spec list_task_days :: nil | [%{optional(atom()) => any()}] | %{optional(atom()) => any()}
-  def list_task_days() do
-    Repo.all(TaskDay)
+  @spec list_task_days(binary()) :: nil | [struct()] | struct()
+  def list_task_days(user_id) do
+    query =
+      from td in TaskDay,
+        select: td,
+        where: td.user_id == ^user_id
+
+    Repo.all(query)
     |> Repo.preload([:tasks])
   end
 
   @spec get_task_day!(binary()) :: struct()
-  def get_task_day!(id), do: Repo.get!(TaskDay, id)
+  defp get_task_day!(id), do: Repo.get!(TaskDay, id)
 
   @spec create_task_day(map()) :: {:ok, struct()} | {:error, Ecto.Changeset.t()}
-  def create_task_day(%{"date" => date}) do
+  defp create_task_day(%{"date" => date, "user_id" => user_id}) do
     date = Date.from_iso8601!(date)
 
     %TaskDay{}
-    |> TaskDay.changeset(%{"date" => date})
+    |> TaskDay.changeset(%{"date" => date, "user_id" => user_id})
     |> Repo.insert()
   end
 
-  @spec get_or_create_task_day(String.t()) :: {:ok, struct()} | {:error, Ecto.Changeset.t()}
-  defp get_or_create_task_day(date) do
-    case Repo.get_by(TaskDay, date: date) do
+  @spec get_or_create_task_day(map()) :: {:ok, struct()} | {:error, Ecto.Changeset.t()}
+  defp get_or_create_task_day(%{"date" => date, "user_id" => user_id}) do
+    case Repo.get_by(TaskDay, date: date, user_id: user_id) do
       nil ->
-        with {:ok, _new_task_day} = result <- create_task_day(%{"date" => date}) do
-          result
-        end
+        create_task_day(%{"date" => date, "user_id" => user_id})
 
       existing_task_day ->
         {:ok, existing_task_day}
@@ -36,25 +41,30 @@ defmodule MyCalendar.Calendar do
   end
 
   @spec remove_task_day(struct()) :: {:ok, struct()} | {:error, Ecto.Changeset.t()}
-  def remove_task_day(%TaskDay{} = task_day), do: Repo.delete(task_day)
+  defp remove_task_day(%TaskDay{} = task_day), do: Repo.delete(task_day)
 
   # Task operations
-  @spec get_task!(binary()) :: struct()
-  def get_task!(id), do: Repo.get!(Task, id)
-
-  @spec get_task(binary()) :: {:ok, struct()} | {:error, :not_found}
-  def get_task(id) do
+  @spec get_task(binary(), binary()) :: {:ok, struct()} | {:error, :not_found}
+  def get_task(id, user_id) do
     case Repo.get(Task, id) do
-      nil -> {:error, :not_found}
-      task -> {:ok, task}
+      nil ->
+        {:error, :not_found}
+
+      task ->
+        task_day = get_task_day!(task.task_day_id)
+
+        case task_day.user_id do
+          ^user_id -> {:ok, task}
+          _ -> {:error, :not_found}
+        end
     end
   end
 
-  @spec add_task(map(), String.t()) :: {:ok, struct()} | {:error, Ecto.Changeset.t()}
-  def add_task(attrs, date) do
+  @spec add_task(map(), String.t(), binary()) :: {:ok, struct()} | {:error, Ecto.Changeset.t()}
+  def add_task(attrs, date, user_id) do
     task_to_add = process_task_time!(attrs)
 
-    with {:ok, task_day} <- get_or_create_task_day(date) do
+    with {:ok, task_day} <- get_or_create_task_day(%{"date" => date, "user_id" => user_id}) do
       task_to_add =
         task_to_add
         |> Map.put("task_day_id", Map.get(task_day, :id))
