@@ -15,12 +15,12 @@ defmodule MyCalendarWeb.Router do
     post "/users", UserController, :register
     post "/session/new", SessionController, :new
     post "/session/refresh", SessionController, :refresh
-
-    get "/task_day", TaskDayController, :index
   end
 
   scope "/api", MyCalendarWeb do
     pipe_through [:api, :auth]
+
+    get "/task_day", TaskDayController, :index
 
     post "/task", TaskController, :create
     put "/task/:id", TaskController, :update
