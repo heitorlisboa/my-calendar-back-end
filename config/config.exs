@@ -25,9 +25,12 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
+# Configures Guardian JWTs duration
 config :my_calendar, MyCalendar.Guardian,
-  issuer: "my_calendar",
-  secret_key: "mysecretkey"
+  token_ttl: %{
+    "access" => {15, :minutes},
+    "refresh" => {1, :week}
+  }
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

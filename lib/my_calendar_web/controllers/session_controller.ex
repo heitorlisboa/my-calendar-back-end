@@ -2,45 +2,42 @@ defmodule MyCalendarWeb.SessionController do
   use MyCalendarWeb, :controller
 
   alias MyCalendar.Accounts
+  alias MyCalendar.Accounts.User
   alias MyCalendar.Guardian
 
   action_fallback MyCalendarWeb.FallbackController
 
   def new(conn, %{"email" => email, "password" => password}) do
-    with {:ok, user} <- Accounts.authenticate_user(email, password) do
+    with {:ok, %User{} = user} <- Accounts.authenticate_user(email, password) do
+      user_info = %{name: user.name, email: user.email}
+
       {:ok, access_token, _claims} =
-        Guardian.encode_and_sign(user, %{}, token_type: "access", ttl: {15, :minute})
+        Guardian.encode_and_sign(user, user_info, token_type: "access")
 
       {:ok, refresh_token, _claims} =
-        Guardian.encode_and_sign(user, %{}, token_type: "refresh", ttl: {7, :day})
+        Guardian.encode_and_sign(user, user_info, token_type: "refresh")
 
       conn
-      # ruid = refresh unique id
-      |> put_resp_cookie("ruid", refresh_token)
       |> put_status(:created)
-      |> render("token.json", access_token: access_token)
+      |> render("token.json",
+        access_token: access_token,
+        refresh_token: refresh_token
+      )
     end
   end
 
-  def refresh(conn, _params) do
-    refresh_token =
-      conn
-      |> Plug.Conn.fetch_cookies()
-      |> Map.from_struct()
-      |> get_in([:cookies, "ruid"])
-
-    with {:ok, _old_token_and_claims, {new_access_token, _new_claims}} <-
-           Guardian.exchange(refresh_token, "refresh", "access") do
+  def refresh(conn, %{"refresh_token" => refresh_token}) do
+    with {:ok, %{"name" => _, "email" => _}} <- Guardian.decode_and_verify(refresh_token),
+         {:ok, _old_token_and_claims, {new_access_token, _new_claims}} <-
+           Guardian.exchange(refresh_token, "refresh", "access"),
+         {:ok, _old_token_and_claims, {new_refresh_token, _new_claims}} <-
+           Guardian.refresh(refresh_token) do
       conn
       |> put_status(:created)
-      |> render("token.json", access_token: new_access_token)
+      |> render("token.json",
+        access_token: new_access_token,
+        refresh_token: new_refresh_token
+      )
     end
-  end
-
-  def delete(conn, _params) do
-    conn
-    |> delete_resp_cookie("ruid")
-    |> put_status(:ok)
-    |> text("Sucessfully logged out")
   end
 end
