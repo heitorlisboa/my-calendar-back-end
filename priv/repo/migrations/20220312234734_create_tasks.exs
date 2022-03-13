@@ -7,7 +7,7 @@ defmodule MyCalendar.Repo.Migrations.CreateTasks do
       add :label, :string, null: false
       add :description, :text
       add :time, :time
-      add :task_day_id, references(:task_days, type: :uuid)
+      add :task_day_id, references(:task_days, type: :uuid), null: false
 
       timestamps()
     end

@@ -5,7 +5,7 @@ defmodule MyCalendar.Calendar.TaskDay do
   alias MyCalendar.Accounts.User
   alias MyCalendar.Calendar.Task
 
-  @fields [:date]
+  @fields [:date, :user_id]
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
