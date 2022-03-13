@@ -4,6 +4,8 @@ defmodule MyCalendarWeb.UserController do
   alias MyCalendar.Accounts
   alias MyCalendar.Accounts.User
 
+  action_fallback MyCalendarWeb.FallbackController
+
   def register(conn, user_to_create) do
     with {:ok, %User{}} <- Accounts.create_user(user_to_create) do
       conn
